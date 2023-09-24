@@ -4,11 +4,17 @@ import { useNostrify } from "@/contexts/Nostrify";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useEffect } from "react";
 import styles from "./page.module.css";
+import useProfile from "@/hooks/useProfile";
 
 export default function Home() {
   const { connect, userPubkey } = useNostrify();
+  const { profile } = useProfile(userPubkey);
 
-  const { events } = useSubscription({
+  useEffect(() => {
+    console.log(profile);
+  }, [profile]);
+
+  const { events: userPosts } = useSubscription({
     filters: [
       {
         authors: [userPubkey],
@@ -19,8 +25,8 @@ export default function Home() {
   });
 
   useEffect(() => {
-    console.log(events);
-  }, [events]);
+    console.log(userPosts);
+  }, [userPosts]);
 
   return (
     <main className={styles.main}>

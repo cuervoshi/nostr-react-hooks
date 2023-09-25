@@ -2,7 +2,7 @@ import { useNostrify } from "@/contexts/Nostrify";
 import { NDKEvent, NostrEvent } from "@nostr-dev-kit/ndk";
 
 interface UsePostsReturn {
-  publish: (event: NostrEvent) => void;
+  publish: (event: NostrEvent) => Promise<{ success: boolean, error?: any}>;
 }
 
 export const usePublishEvent = (): UsePostsReturn => {
@@ -16,8 +16,10 @@ export const usePublishEvent = (): UsePostsReturn => {
       ndkEvent.tags = event.tags;
 
       await ndkEvent.publish();
-    } catch {
-      return null;
+
+      return { success:true }
+    } catch(error) {
+      return { success:false, error }
     }
   };
 

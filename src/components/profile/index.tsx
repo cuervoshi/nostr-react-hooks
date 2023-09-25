@@ -7,10 +7,7 @@ interface ProfileProps {
 
 export const Profile = ({ pubKey }: ProfileProps) => {
   const { profile } = useProfile(pubKey);
-
-  if (!profile) {
-    return <div>Cargando perfil...</div>;
-  }
+  if (!profile) return <div>Cargando perfil...</div>;
 
   return (
     <div className="text-md mb-5 flex flex-col justify-center md:flex-row">

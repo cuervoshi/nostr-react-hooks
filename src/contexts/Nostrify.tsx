@@ -1,6 +1,10 @@
 "use client";
 import NostrExtensionProvider from "@/types/nostr";
-import NDK, { NDKNip07Signer } from "@nostr-dev-kit/ndk";
+import NDK, {
+  NDKNip07Signer,
+  NDKPrivateKeySigner,
+  NDKUser,
+} from "@nostr-dev-kit/ndk";
 import type { WebLNProvider as WebLNExtensionProvider } from "@webbtc/webln-types";
 import React, {
   ReactNode,
@@ -25,6 +29,7 @@ export interface INostrContext {
   providers: LightningProvidersType;
   ndk: NDK;
   connect: () => void;
+  connectWithHexKey: (hexKey: string) => Promise<boolean>;
   requestPublicKey: () => Promise<string>;
   userPubkey: string;
 }
@@ -47,16 +52,49 @@ const useNOSTR = (explicitRelayUrls: string[]): INostrContext => {
       nostr: window.nostr,
     });
 
-    const nip07signer = new NDKNip07Signer();
-    const ndkProvider = new NDK({
-      explicitRelayUrls,
-      signer: nip07signer,
-    });
-    setNDK(ndkProvider);
+    if (window.nostr) {
+      const nip07signer = new NDKNip07Signer();
+      const ndkProvider = new NDK({
+        explicitRelayUrls,
+        signer: nip07signer,
+      });
+      setNDK(ndkProvider);
 
-    await ndkProvider.connect();
+      await ndkProvider.connect();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const initializeNDK = async (
+    signer: NDKNip07Signer | NDKPrivateKeySigner
+  ) => {
+    try {
+      const ndkProvider = new NDK({
+        explicitRelayUrls,
+        signer,
+      });
+      setNDK(ndkProvider);
+
+      await ndkProvider.connect();
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const connectWithHexKey = async (hexKey: string): Promise<boolean> => {
+    try {
+      const privateKeySigner = new NDKPrivateKeySigner(hexKey);
+      const ndkInitialized: boolean = await initializeNDK(privateKeySigner);
+
+      const user: NDKUser = await privateKeySigner.user();
+      if (user && user._hexpubkey) setUserPubkey(user._hexpubkey);
+
+      return ndkInitialized;
+    } catch {
+      return false;
+    }
+  };
 
   const connect = async () => {
     if (!providers.webln) return null;
@@ -83,7 +121,14 @@ const useNOSTR = (explicitRelayUrls: string[]): INostrContext => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { providers, ndk, connect, userPubkey, requestPublicKey };
+  return {
+    providers,
+    ndk,
+    connect,
+    connectWithHexKey,
+    userPubkey,
+    requestPublicKey,
+  };
 };
 
 export function NostrifyProvider({

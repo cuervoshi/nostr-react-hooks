@@ -1,15 +1,14 @@
-//@ts-nocheck
 "use client";
+import ConnectWithExtension from "@/components/connect/WithExtension";
+import ConnectWithKey from "@/components/connect/WithKey";
+import PublishPost from "@/components/posts/publish";
 import { useNostrify } from "@/contexts/Nostrify";
-import usePublishEvent from "@/hooks/usePublishEvent";
 import { useRouter } from "next/navigation";
 import { nip19 } from "nostr-tools";
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 
 export default function Home() {
-  const { connect, userPubkey } = useNostrify();
-  const { publish } = usePublishEvent();
-  const inputRef = useRef();
+  const { providers, userPubkey } = useNostrify();
 
   const router = useRouter();
 
@@ -22,7 +21,11 @@ export default function Home() {
   return (
     <main>
       {!userPubkey ? (
-        <button onClick={connect}>Login</button>
+        providers.webln ? (
+          <ConnectWithExtension />
+        ) : (
+          <ConnectWithKey />
+        )
       ) : (
         <>
           <p>Tu clave publica: {userPubkey}</p>
@@ -30,17 +33,7 @@ export default function Home() {
 
           <br />
 
-          <h1>Publicar un posteo</h1>
-          <input ref={inputRef} type="text" />
-          <button
-            type="submit"
-            onClick={() => {
-              const text = inputRef.current.value;
-              if (text) publish({ kind: 1, content: text });
-            }}
-          >
-            Enviar
-          </button>
+          <PublishPost />
         </>
       )}
     </main>

@@ -2,7 +2,7 @@ import { useNostrify } from "@/contexts/Nostrify";
 import { NDKEvent, NostrEvent } from "@nostr-dev-kit/ndk";
 
 interface UsePostsReturn {
-  publish: (kind: number, content: any, tags: Array<Array<String>>) => void;
+  publish: (event: NostrEvent) => void;
 }
 
 export const usePublishEvent = (): UsePostsReturn => {

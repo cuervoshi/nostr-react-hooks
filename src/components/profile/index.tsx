@@ -26,7 +26,7 @@ export const Profile = ({ pubKey }: ProfileProps) => {
         )}
       </div>
       <div className="flex flex-col p-4 text-lg">
-        <div className="text-3xl">{profile?.display_name}</div>
+        <h3>{profile?.name}</h3>
         {profile.about && <div>{profile.about}</div>}
         {profile.nip05 && <div>{profile.nip05}</div>}
         {profile.website && (

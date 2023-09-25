@@ -1,39 +1,29 @@
-//@ts-nocheck
 "use client";
 import { useNostrify } from "@/contexts/Nostrify";
-import { useSubscription } from "@/hooks/useSubscription";
-import { useEffect } from "react";
-import styles from "./page.module.css";
-import useProfile from "@/hooks/useProfile";
+import { useRouter } from "next/navigation";
+import { nip19 } from "nostr-tools";
+import { useCallback } from "react";
 
 export default function Home() {
   const { connect, userPubkey } = useNostrify();
-  const { profile } = useProfile(userPubkey);
 
-  useEffect(() => {
-    console.log(profile);
-  }, [profile]);
+  const router = useRouter();
 
-  const { events: userPosts } = useSubscription({
-    filters: [
-      {
-        authors: [userPubkey],
-        kinds: [1],
-      },
-    ],
-    enabled: userPubkey.length,
-  });
-
-  useEffect(() => {
-    console.log(userPosts);
-  }, [userPosts]);
+  const goProfile = useCallback(() => {
+    const npub = nip19.npubEncode(userPubkey);
+    void router.push(`/p/${npub}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userPubkey]);
 
   return (
-    <main className={styles.main}>
+    <main>
       {!userPubkey ? (
         <button onClick={connect}>Login</button>
       ) : (
-        <p>Tu clave publica: {userPubkey}</p>
+        <>
+          <p>Tu clave publica: {userPubkey}</p>
+          <button onClick={() => void goProfile()}>Ver perfil</button>
+        </>
       )}
     </main>
   );

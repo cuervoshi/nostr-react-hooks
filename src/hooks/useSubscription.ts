@@ -15,10 +15,15 @@ export interface IUseSubscription {
 
 export type SubscriptionProps = {
   filters: NDKFilter[];
+  options: NDKSubscriptionOptions;
   enabled: boolean;
 };
 
-export const useSubscription = ({ filters, enabled }: SubscriptionProps) => {
+export const useSubscription = ({
+  filters,
+  options,
+  enabled,
+}: SubscriptionProps) => {
   const { ndk }: INostrContext = useNostrify();
 
   const [subscription, setSubscription] = useState<NDKSubscription>();
@@ -26,11 +31,6 @@ export const useSubscription = ({ filters, enabled }: SubscriptionProps) => {
 
   const startSubscription = useCallback(() => {
     if (ndk) {
-      const options: NDKSubscriptionOptions = {
-        groupable: false,
-        closeOnEose: false,
-      };
-
       const newSubscription = ndk.subscribe(filters, options);
       setSubscription(newSubscription);
       return;

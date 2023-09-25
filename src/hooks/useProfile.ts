@@ -14,6 +14,9 @@ export const useProfile = (pubKey: string): UseProfileReturn => {
         authors: [pubKey],
       },
     ],
+    options: {
+      closeOnEose: true,
+    },
     enabled: Boolean(pubKey.length),
   });
   const [profile, setProfile] = useState<Profile>(null);

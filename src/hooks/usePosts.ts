@@ -19,6 +19,10 @@ export const usePosts = ({ pubKey, limit }: PostsProps): UsePostsReturn => {
         limit,
       },
     ],
+    options: {
+      groupable: false,
+      closeOnEose: false,
+    },
     enabled: Boolean(pubKey.length),
   });
 

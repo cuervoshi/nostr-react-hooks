@@ -1,6 +1,6 @@
 "use client";
 import NostrExtensionProvider from "@/types/nostr";
-import NDK from "@nostr-dev-kit/ndk";
+import NDK, { NDKNip07Signer } from "@nostr-dev-kit/ndk";
 import type { WebLNProvider as WebLNExtensionProvider } from "@webbtc/webln-types";
 import React, {
   ReactNode,
@@ -32,11 +32,7 @@ export interface INostrContext {
 const nostrContext: React.Context<any> = createContext(null);
 
 const useNOSTR = (explicitRelayUrls: string[]): INostrContext => {
-  const [ndk] = useState<NDK>(
-    new NDK({
-      explicitRelayUrls,
-    })
-  );
+  const [ndk, setNDK] = useState<NDK>(null);
 
   const [providers, setProviders] = useState<LightningProvidersType>({
     webln: undefined,
@@ -50,6 +46,16 @@ const useNOSTR = (explicitRelayUrls: string[]): INostrContext => {
       webln: window.webln,
       nostr: window.nostr,
     });
+
+    const nip07signer = new NDKNip07Signer();
+    const ndkProvider = new NDK({
+      explicitRelayUrls,
+      signer: nip07signer,
+    });
+    setNDK(ndkProvider);
+
+    await ndkProvider.connect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const connect = async () => {
@@ -74,7 +80,6 @@ const useNOSTR = (explicitRelayUrls: string[]): INostrContext => {
 
   useEffect(() => {
     loadProviders();
-    ndk.connect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -23,7 +23,11 @@ export const useProfile = (pubKey: string): UseProfileReturn => {
 
   useEffect(() => {
     userMetadata.map((event) => {
-      setProfile(JSON.parse(event.content) as Profile);
+      try {
+        setProfile(JSON.parse(event.content) as Profile);
+      } catch {
+        alert("ocurrió un error al cargar el perfil");
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userMetadata]);

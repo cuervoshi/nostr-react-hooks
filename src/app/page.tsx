@@ -21,11 +21,10 @@ export default function Home() {
   return (
     <main>
       {!userPubkey ? (
-        providers.webln ? (
-          <ConnectWithExtension />
-        ) : (
+        <>
+          {providers.webln && <ConnectWithExtension />}
           <ConnectWithKey />
-        )
+        </>
       ) : (
         <>
           <p>Tu clave publica: {userPubkey}</p>

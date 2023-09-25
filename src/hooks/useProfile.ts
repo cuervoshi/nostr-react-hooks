@@ -1,12 +1,16 @@
-import { Profile } from "@/types/profile";
-import { useEffect, useState } from "react";
-import { useSubscription } from "./useSubscription";
+import { Profile } from '@/types/profile';
+import { useEffect, useState } from 'react';
+import { nip19 } from 'nostr-tools';
+import { useSubscription } from './useSubscription';
 
 interface UseProfileReturn {
   profile: Profile;
+  id: string;
 }
 
 export const useProfile = (pubKey: string): UseProfileReturn => {
+  const profileId = nip19.npubEncode(pubKey);
+
   const { events: userMetadata } = useSubscription({
     filters: [
       {
@@ -26,13 +30,13 @@ export const useProfile = (pubKey: string): UseProfileReturn => {
       try {
         setProfile(JSON.parse(event.content) as Profile);
       } catch {
-        alert("ocurrió un error al cargar el perfil");
+        alert('ocurrió un error al cargar el perfil');
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userMetadata]);
 
-  return { profile };
+  return { profile, id: profileId };
 };
 
 export default useProfile;

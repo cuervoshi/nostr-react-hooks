@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import Link from 'next/link'
 import { Inter } from "next/font/google";
 
+import Navbar from '@/components/layouts/navbar';
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,17 +19,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <nav>
-          <ul>
-            <li>
-            <Link href='/'>Inicio</Link>
-            </li>
-            <li>
-            <Link href='/settings'>Configuracion</Link>
-            </li>
-          </ul>
-        </nav>
         <NostrifyProvider explicitRelayUrls={["wss://relay.damus.io/"]}>
+          <Navbar />
           {children}
         </NostrifyProvider>
       </body>
